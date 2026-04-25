@@ -139,6 +139,62 @@ void print_SV_trung_NgaySinh(List l)
         cout << "Khong co sinh vien nao trung ngay sinh." << endl;
 }
 
+void xoa_SV_trung_NgaySinh(List &l)
+{
+    // Bước 1: Thu thập maSV cần xóa
+    char canXoa[100][10];
+    int soLuong = 0;
+
+    Node *p = l.first;
+    while (p != NULL)
+    {
+        int count = 0;
+        Node *q = l.first;
+        while (q != NULL)
+        {
+            if (soSanhNgay(p->data.ngaySinh, q->data.ngaySinh))
+                count++;
+            q = q->link;
+        }
+        if (count >= 2)
+        {
+            strcpy(canXoa[soLuong], p->data.maSV);
+            soLuong++;
+        }
+        p = p->link;
+    }
+
+    // Bước 2: Xóa từng maSV trong danh sách canXoa
+    for (int i = 0; i < soLuong; i++)
+    {
+        // Xóa node đầu
+        while (l.first != NULL && strcmp(l.first->data.maSV, canXoa[i]) == 0)
+        {
+            Node *del = l.first;
+            l.first = l.first->link;
+            if (l.first == NULL) l.last = NULL;
+            delete del;
+        }
+
+        // Xóa node giữa/cuối
+        Node *prev = l.first;
+        while (prev != NULL && prev->link != NULL)
+        {
+            if (strcmp(prev->link->data.maSV, canXoa[i]) == 0)
+            {
+                Node *del = prev->link;
+                prev->link = del->link;
+                if (del == l.last) l.last = prev;
+                delete del;
+            }
+            else
+            {
+                prev = prev->link;
+            }
+        }
+    }
+}
+
 int main()
 {
     List l;
@@ -160,6 +216,10 @@ int main()
 
     cout << "Danh sach sinh vien trung ngay sinh:\n";
     print_SV_trung_NgaySinh(l);
+
+    cout << "\nSau khi loai bo SV trung ngay sinh:\n";
+    xoa_SV_trung_NgaySinh(l);
+    print_SV(l);
 
     return 0;
 }
